@@ -1,53 +1,42 @@
 #!/bin/bash
 
-# Variables
-EXPORTER_VERSION="2.2.0"  # Replace with the latest version available
-EXPORTER_TAR="postgres_exporter_v${EXPORTER_VERSION}_linux-amd64.tar.gz"
-EXPORTER_URL="https://github.com/prometheus-community/postgres_exporter/releases/download/v${EXPORTER_VERSION}/${EXPORTER_TAR}"
-EXPORTER_BIN="/usr/local/bin/postgres_exporter"
-EXPORTER_SERVICE="/etc/systemd/system/postgres_exporter.service"
-EXPORTER_CONFIG="/etc/postgres_exporter.yml"
-POSTGRES_USER="postgres"
-POSTGRES_PASSWORD="password"
-EXPORTER_PORT="9187"
+# Set variables
+POSTGRES_EXPORTER_VERSION="0.11.0"
+POSTGRES_EXPORTER_USER="postgres_exporter"
+POSTGRES_EXPORTER_BINARY="postgres_exporter_v${POSTGRES_EXPORTER_VERSION}_linux-amd64"
+POSTGRES_EXPORTER_DOWNLOAD_URL="https://github.com/wrouesnel/postgres_exporter/releases/download/v${POSTGRES_EXPORTER_VERSION}/${POSTGRES_EXPORTER_BINARY}.tar.gz"
+POSTGRES_EXPORTER_SERVICE_FILE="/etc/systemd/system/postgres_exporter.service"
 
-# Install required tools
-# sudo yum install -y wget tar
+# Download and extract PostgreSQL Exporter
+wget "$POSTGRES_EXPORTER_DOWNLOAD_URL"
+tar xvfz "${POSTGRES_EXPORTER_BINARY}.tar.gz"
+sudo mv "$POSTGRES_EXPORTER_BINARY/postgres_exporter" /usr/local/bin/
 
-# Download and extract PostgreSQL Node Exporter
-wget "$EXPORTER_URL"
-tar xvfz "$EXPORTER_TAR"
-sudo mv "postgres_exporter_v${EXPORTER_VERSION}_linux-amd64/postgres_exporter" "$EXPORTER_BIN"
-rm -rf "postgres_exporter_v${EXPORTER_VERSION}_linux-amd64" "$EXPORTER_TAR"
+# Create dedicated user
+sudo useradd --no-create-home --shell /bin/false "$POSTGRES_EXPORTER_USER"
+sudo chown "$POSTGRES_EXPORTER_USER:$POSTGRES_EXPORTER_USER" /usr/local/bin/postgres_exporter
 
-# Create a PostgreSQL user for the exporter
-# psql -U postgres -c "CREATE USER $POSTGRES_USER WITH PASSWORD '$POSTGRES_PASSWORD';"
-# psql -U postgres -c "ALTER USER $POSTGRES_USER WITH SUPERUSER;"
-
-# Create configuration file
-echo "data_source_name: \"postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/?sslmode=disable\"" | sudo tee "$EXPORTER_CONFIG"
-
-# Create systemd service
-echo "[Unit]
-Description=PostgreSQL Node Exporter
+# Create systemd service file
+sudo tee "$POSTGRES_EXPORTER_SERVICE_FILE" > /dev/null <<EOF
+[Unit]
+Description=PostgreSQL Exporter
 After=network.target
 
 [Service]
-ExecStart=$EXPORTER_BIN --config.file=$EXPORTER_CONFIG
-Restart=always
-User=$POSTGRES_USER
-LimitNOFILE=infinity
+User=$POSTGRES_EXPORTER_USER
+ExecStart=/usr/local/bin/postgres_exporter --web.listen-address=":9187" --web.telemetry-path="/metrics" --log.level="info" --postgres.user="your_postgres_user" --postgres.password="your_postgres_password" --postgres.host="your_postgres_host" --postgres.port="your_postgres_port" --extend.query-path="/path/to/queries.yml"
 
 [Install]
-WantedBy=default.target" | sudo tee "$EXPORTER_SERVICE"
+WantedBy=default.target
+EOF
 
-# Start and enable the service
+# Reload systemd and start PostgreSQL Exporter
+sudo systemctl daemon-reload
 sudo systemctl start postgres_exporter
 sudo systemctl enable postgres_exporter
-
-# Open firewall port for PostgreSQL Node Exporter
-# sudo firewall-cmd --zone=public --add-port=$EXPORTER_PORT/tcp --permanent
-# sudo firewall-cmd --reload
+sudo systemctl status postgres_exporter
 
 # Clean up
-# rm -f install_postgres_exporter.sh
+# rm -rf "${POSTGRES_EXPORTER_BINARY}.tar.gz" "$POSTGRES_EXPORTER_BINARY"
+
+echo "PostgreSQL Exporter has been installed and configured. Verify metrics at http://your_instance_ip:9187/metrics."
