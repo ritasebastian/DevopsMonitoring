@@ -1,3 +1,4 @@
 # DevopsMonitoring
-# Installing PROMETHEUS
+Installing PROMETHEUS - sudo ./install_prometheus.sh
+
 
