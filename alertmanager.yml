@@ -1,0 +1,16 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: [Alertname]
+  receiver: email-me
+
+receivers:
+- name: email-me
+  email_configs:
+  - to: rita.sebastian2017@gmail.com
+    from: rita.sebastian2017@gmail.com
+    smarthost: smtp.gmail.com:587
+    auth_username: "rita.sebastian2017@gmail.com"
+    auth_password: "zlpt oxol usep pzho ab"
+    send_resolved: true
