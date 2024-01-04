@@ -1,0 +1,6 @@
+sudo vi /etc/.mysqld_exporter.cnf
+
+[client]
+user=mysqld_exporter
+password=PASSWD
+host=192.168.56.109
