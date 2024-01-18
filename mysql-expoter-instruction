@@ -1,5 +1,6 @@
 Run mysql_nodeexpoter.sh
-edit files
-mysqld_exporter.cnf
-
+edit below files
+   mysqld_exporter.cnf
+   mysqld_exporter.service
+Add job on Prometheus yml file
 Dashboar URl: https://grafana.com/grafana/dashboards/14057-mysql/
