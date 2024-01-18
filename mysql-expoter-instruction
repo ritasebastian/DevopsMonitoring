@@ -1,4 +1,5 @@
 Run mysql_nodeexpoter.sh
 edit files
+mysqld_exporter.cnf
 
 Dashboar URl: https://grafana.com/grafana/dashboards/14057-mysql/
