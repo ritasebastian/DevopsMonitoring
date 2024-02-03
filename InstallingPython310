@@ -6,6 +6,8 @@
 current_version=$(python3 --version 2>&1)
 echo "Current Python version: $current_version"
 
+sudo yum install -y gcc make libffi-devel zlib-devel
+
 # Download Python 3.10.12 source code
 wget https://www.python.org/ftp/python/3.10.12/Python-3.10.12.tgz
 
