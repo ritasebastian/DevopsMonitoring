@@ -1,0 +1,54 @@
+# Install Mariadb10.x
+sudo dnf install -y mariadb105-server
+sudo systemctl start mariadb
+sudo systemctl enable mariadb
+sudo systemctl status mariadb
+
+# Edit Parameter File
+sudo vi /etc/my.cnf.d/mariadb-server.cnf
+server-id = 2  
+expire_logs_days=2
+binlog_format = ROW 
+max_binlog_size = 1G 
+log-bin =mariadb-bin
+binlog_row_image=FULL
+binlog_checksum=NONE
+log_slave_updates=TRUE
+log-bin-index =mariadb-bin.index
+# gtid_mode = ON
+# enforce_gtid_consistency = ON
+# bind-address = 0.0.0.0
+
+# Create Admin and Replication Users
+CREATE USER 'admin_user'@'%' IDENTIFIED BY 'admin_password';
+GRANT ALL PRIVILEGES ON *.* TO 'admin_user'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+CREATE USER 'replication_user'@'%' IDENTIFIED BY 'bigs3cret';
+GRANT REPLICATION CLIENT, REPLICATION SLAVE ON *.* TO 'replication_user'@'%';
+FLUSH PRIVILEGES;
+
+# Get binlog Information
+show master status;
+
+# run this shell script
+
+read -p "Enter the replication master username: " username
+read -s -p "Enter the replication master password: " password
+echo ""
+read -p "Enter the replication host: " host
+read -p "Enter the replication port: " port
+read -p "Enter the log file name: " logFile
+read -p "Enter the log position: " logPosition
+echo "MySQL admin_user password below: "
+mysql -u admin_user -p -e "
+STOP SLAVE;
+CHANGE MASTER TO MASTER_HOST='$host', MASTER_PORT=$port, MASTER_USER='$username', MASTER_PASSWORD='$password', MASTER_LOG_FILE='$logFile', MASTER_LOG_POS=$logPosition;
+START SLAVE;"
+
+# Samplle dataload
+https://github.com/datacharmer/test_db.git
+git@github.com:datacharmer/test_db.git
+unzip test_db-master.zip
+ cd test_db-master/
+ mysql -t < employees.sql
