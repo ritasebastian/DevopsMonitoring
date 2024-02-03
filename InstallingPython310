@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Install Python 3.10.12
+
+# Check current Python version
+current_version=$(python3 --version 2>&1)
+echo "Current Python version: $current_version"
+
+# Download Python 3.10.12 source code
+wget https://www.python.org/ftp/python/3.10.12/Python-3.10.12.tgz
+
+# Extract source code
+tar xzf Python-3.10.12.tgz
+
+# Navigate into the extracted directory
+cd Python-3.10.12
+
+# Configure and install Python
+./configure
+make
+sudo make install
+
+# Verify the installation
+new_version=$(python3 --version 2>&1)
+echo "Python 3.10.12 installed: $new_version"
