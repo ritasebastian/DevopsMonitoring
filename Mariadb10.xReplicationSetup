@@ -52,3 +52,28 @@ git@github.com:datacharmer/test_db.git
 unzip test_db-master.zip
  cd test_db-master/
  mysql -t < employees.sql
+
+
+Backup Steps:
+https://mariadb.com/kb/en/setting-up-a-replica-with-mariabackup/
+sudo su 
+
+mariabackup --backup \
+   --target-dir=/home/ec2-user/backup \
+   --user=admin_user --password=admin_password
+mariabackup --prepare \
+   --target-dir=/home/ec2-user/backup
+
+sudo systemctl stop mariadb
+sudo rm -rf /var/lib/mysql/
+sudo mkdir /var/lib/mysql
+sudo chown -R mysql:mysql /var/lib/mysql
+
+ 
+   
+ mariabackup --copy-back \
+   --target-dir=/home/ec2-user/backup
+   
+sudo chown -R mysql:mysql /var/lib/mysql/
+
+sudo systemctl start mariadb
