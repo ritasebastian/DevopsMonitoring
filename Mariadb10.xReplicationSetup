@@ -81,3 +81,29 @@ sudo systemctl start mariadb
 cat /home/ec2-user/backup/xtrabackup_binlog_info
 # run this shell script
 
+GTIDs
+If we want to use GTIDs, then we will have to first set gtid_slave_pos to the GTID coordinates that we pulled from either the xtrabackup_binlog_info file or the xtrabackup_slave_info file in the backup directory. For example:
+
+$ cat xtrabackup_binlog_info
+mariadb-bin.000096 568 0-1-2
+And then we would set MASTER_USE_GTID=slave_pos in the CHANGE MASTER TO command. For example:
+
+SET GLOBAL gtid_slave_pos = "0-1-2";
+CHANGE MASTER TO 
+   MASTER_HOST="dbserver1", 
+   MASTER_PORT=3306, 
+   MASTER_USER="repl",  
+   MASTER_PASSWORD="password", 
+   MASTER_USE_GTID=slave_pos;
+START SLAVE;
+File and Position
+If we want to use the binary log file and position coordinates, then we would set MASTER_LOG_FILE and MASTER_LOG_POS in the CHANGE MASTER TO command to the file and position coordinates that we pulled; either the xtrabackup_binlog_info file or the xtrabackup_slave_info file in the backup directory, depending on whether the backup was taken from the primary or from a replica of the primary. For example:
+
+CHANGE MASTER TO 
+   MASTER_HOST="dbserver1", 
+   MASTER_PORT=3306, 
+   MASTER_USER="repl",  
+   MASTER_PASSWORD="password", 
+   MASTER_LOG_FILE='mariadb-bin.000096',
+   MASTER_LOG_POS=568;
+START SLAVE;
