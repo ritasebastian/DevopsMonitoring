@@ -77,3 +77,7 @@ sudo chown -R mysql:mysql /var/lib/mysql
 sudo chown -R mysql:mysql /var/lib/mysql/
 
 sudo systemctl start mariadb
+
+cat /home/ec2-user/backup/xtrabackup_binlog_info
+# run this shell script
+
