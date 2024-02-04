@@ -19,6 +19,9 @@ log-bin-index =mariadb-bin.index
 # enforce_gtid_consistency = ON
 # bind-address = 0.0.0.0
 
+sudo systemctl stop mariadb
+sudo systemctl start mariadb
+
 # Create Admin and Replication Users
 CREATE USER 'admin_user'@'%' IDENTIFIED BY 'admin_password';
 GRANT ALL PRIVILEGES ON *.* TO 'admin_user'@'%' WITH GRANT OPTION;
