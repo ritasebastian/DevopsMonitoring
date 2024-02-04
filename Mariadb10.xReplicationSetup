@@ -75,10 +75,8 @@ sudo systemctl stop mariadb
 sudo rm -rf /var/lib/mysql/
 sudo mkdir /var/lib/mysql
 sudo chown -R mysql:mysql /var/lib/mysql
-
  
-   
- mariabackup --copy-back \
+mariabackup --copy-back \
    --target-dir=/home/ec2-user/backup
    
 sudo chown -R mysql:mysql /var/lib/mysql/
@@ -114,3 +112,23 @@ CHANGE MASTER TO
    MASTER_LOG_FILE='mariadb-bin.000096',
    MASTER_LOG_POS=568;
 START SLAVE;
+
+
+RDS Replication Setup
+Connect to ec2 - db get GTID
+SELECT @@gtid_current_pos;
+Connect to RDS db run below -- id address to be intrnel not public
+CALL mysql.rds_set_external_master_gtid ('172.31.33.85', 3306, 'replication_user', 'bigs3cret', '0-2-17', 0);
+CALL mysql.rds_start_replication; 
+
+Connect to ec2 - db get binlog info
+show master status;
+Connect to RDS db run below -- id address to be intrnel not public
+call mysql.rds_set_external_master ('172.31.33.85', 3306,'replication_user', 'bigs3cret','mariadb-bin.000003',4828,0);
+CALL mysql.rds_start_replication; 
+
+CALL mysql.rds_stop_replication;
+CALL mysql.rds_reset_external_master;
+CALL mysql.rds_replica_status\G
+
+
