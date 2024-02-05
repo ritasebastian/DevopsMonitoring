@@ -6,7 +6,11 @@
 current_version=$(python3 --version 2>&1)
 echo "Current Python version: $current_version"
 
-sudo yum install -y gcc make libffi-devel zlib-devel
+sudo dnf install -y gcc make libffi-devel zlib-devel
+sudo dnf install -y groupinstall "Development Tools"
+sudo dnf install -y openssl-devel bzip2-devel 
+sudo dnf install -y sqlite-devel
+sudo dnf install -y libsqlite3-dev
 
 # Download Python 3.10.12 source code
 wget https://www.python.org/ftp/python/3.10.12/Python-3.10.12.tgz
