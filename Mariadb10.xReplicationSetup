@@ -53,10 +53,11 @@ START SLAVE;"
 
 # Samplle dataload
 https://github.com/datacharmer/test_db.git
-git@github.com:datacharmer/test_db.git
-unzip test_db-master.zip
- cd test_db-master/
- mysql -t < employees.sql
+sudo dnf install git
+git clone git@github.com:datacharmer/test_db.git
+cd test_db
+sudo su
+mysql -t < employees.sql
 
 
 Backup Steps:
