@@ -1,4 +1,5 @@
 ss -tuln | grep port_number
+ss -tuln | grep 21000
 telnet smtp.gmail.com 587
 curl -v telnet://host_name(rdsendpoint):port_number
 Postgres Expoter https://schh.medium.com/monitoring-postgresql-databases-using-postgres-exporter-along-with-prometheus-and-grafana-1d68209ca687
